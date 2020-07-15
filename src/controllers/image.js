@@ -21,11 +21,13 @@ const mimeTypes = {
 module.exports = (request, response, next) => {
   const {sourceAdapter} = response.locals
   const {config, plugins} = request.app.locals
-  const urlPath = request.params['0']
 
-  const responseHandlers = values(plugins['response-handler'] || {})
-  const metadataResolvers = values(plugins['metadata-resolver'] || {})
-  const inputOptionResolvers = values(plugins['input-option-resolver'] || {})
+  const urlRewriters = getPlugins(plugins, 'url-rewriter')
+  const responseHandlers = getPlugins(plugins, 'response-handler')
+  const metadataResolvers = getPlugins(plugins, 'metadata-resolver')
+  const inputOptionResolvers = getPlugins(plugins, 'input-option-resolver')
+
+  const urlPath = urlRewriters.reduce((path, rewriter) => rewriter(path), request.params['0'])
   const context = {request, response, urlPath}
   const pixelLimit = typeof config.vips.limitInputPixels === 'undefined' ? 268402689 : config.vips.limitInputPixels
 
@@ -165,6 +167,10 @@ function getHeaders(info, params, response) {
   })
 
   return headers
+}
+
+function getPlugins(plugins, type) {
+  return values(plugins[type] || {})
 }
 
 function getCacheControlHeader(response) {
