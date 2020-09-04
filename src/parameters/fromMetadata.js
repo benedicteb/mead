@@ -23,8 +23,15 @@ function validateSourceRectCoords(params, meta) {
     return
   }
 
+  let imageWidth = meta.width
+  let imageHeight = meta.height
+  if (typeof params.orientation === 'undefined' && (meta.orientation === 8 || meta.orientation === 6)) {
+    imageWidth = meta.height
+    imageHeight = meta.width
+  }
+
   const [left, top, width, height] = rect
-  if (left + width > meta.width || top + height > meta.height) {
+  if (left + width > imageWidth || top + height > imageHeight) {
     throw new ValidationError('Source rectangle coordinates out of bounds')
   }
 }

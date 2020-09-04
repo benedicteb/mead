@@ -13,6 +13,7 @@ const DEFAULT_BG_COLOR_ALPHA = {r: 255, g: 255, b: 255, alpha: 0} // eslint-disa
 const DEFAULT_BG_COLOR = {r: 255, g: 255, b: 255} // eslint-disable-line id-length
 
 const pipeline = [
+  autoRotate,
   sourceRect,
   background,
   invert,
@@ -380,19 +381,31 @@ function clamp(inp, min, max) {
   return Math.min(max, Math.max(min, Math.round(inp)))
 }
 
-function orientation(tr, params) {
-  // Auto-rotate by EXIF if no rotation is explicitly set
+function autoRotate(tr, params, meta) {
   if (isDefined(params.orientation)) {
-    tr && tr.rotate(params.orientation)
-    if (params.orientation % 180) {
-      params.outputSize = {
-        width: params.outputSize.height,
-        height: params.outputSize.width
-      }
+    return
+  }
+
+  tr && tr.rotate()
+  if (meta.orientation === 8 || meta.orientation === 6) {
+    // @todo this is a hack. We should have a "current input size" that we track and modify throughout
+    const {width, height} = meta
+    meta.width = height
+    meta.height = width
+  }
+}
+
+function orientation(tr, params) {
+  if (!isDefined(params.orientation)) {
+    return
+  }
+
+  tr && tr.rotate(params.orientation)
+  if (params.orientation % 180) {
+    params.outputSize = {
+      width: params.outputSize.height,
+      height: params.outputSize.width
     }
-  } else {
-    // @todo redefine output size
-    tr && tr.rotate()
   }
 }
 

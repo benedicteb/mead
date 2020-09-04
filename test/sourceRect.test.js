@@ -24,6 +24,14 @@ test('[sourceRect] scales passed source rect', done => {
   })
 })
 
+test('[sourceRect] scales correctly based on orientation', done => {
+  readImage('climb.jpg?rect=0,0,3016,4032').then(img => {
+    expect(img.width).toBe(3016)
+    expect(img.height).toBe(4032)
+    done()
+  })
+})
+
 test('[sourceRect] scales passed source rect with focal point', done => {
   readImage('landscape.png?rect=384,243,768,486&crop=focalpoint&w=384&h=243&fit=crop&fp-x=0.25&fp-y=0.75').then(img => {
     expect(img.width).toBe(384)
