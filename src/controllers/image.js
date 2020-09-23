@@ -141,6 +141,7 @@ function getHeaders(info, params, response) {
   const headers = {}
 
   // Security
+  headers['content-security-policy'] = 'script-src \'none\''
   headers['x-content-type-options'] = 'nosniff'
 
   // Content type
