@@ -42,6 +42,20 @@ module.exports = (config, callback = null) => {
 }
 
 function initApp(app, config, callback) {
+  /*
+   * Plugins with
+   *
+   *   { ...
+   *     type: "preflightMiddleware"
+   *     ... }
+   *
+   * Will be added as the first middlewares. Use this to control pre-request
+   * handling behaviour.
+   */
+  values(
+    app.locals.plugins.preflightMiddleware || {}
+  ).forEach(preflightMiddleware => app.use(preflightMiddleware))
+
   // Always serve the index route
   app.get('/', require('./controllers/index'))
 
